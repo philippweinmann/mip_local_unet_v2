@@ -3,10 +3,10 @@ import nibabel as nib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-new_directory = "/home/tu-philw/group/gecko/pweinmann/mip_local_unet_v2/"
+new_directory = "/home/tu-philw/group/gecko/pweinmann/mip_local_unet_v2/src/notebooks"
 os.chdir(new_directory)
 # %%
-from preprocessing.patient_loader import get_patients
+from src.preprocessing.patient_loader import get_patients
 
 # %%
 patients = get_patients()
