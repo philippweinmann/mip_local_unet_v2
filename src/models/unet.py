@@ -87,6 +87,7 @@ class UNet3D(nn.Module):
 
 # -------Loss-Functions----------
 def calculate_dice_loss_multiplier(mask):
+    print("mask shape is ", mask.shape)
     number_of_positive_voxels = mask.sum()
     print(f"number of positive voxels is {number_of_positive_voxels}")
 
