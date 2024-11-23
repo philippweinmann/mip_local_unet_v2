@@ -108,6 +108,11 @@ def dice_bce_loss(predictions, targets):
     The goal is to get the advantages
     from the soft dice loss without its potential instabilities.
     '''
+    # visualize prediction, mask
+    print(predictions.shape)
+    print(targets.shape)
+    # from matplotlib import pyplot as plt
+
     soft_dice_loss = softdiceloss(predictions, targets)
     bce_loss = nn.BCELoss()(predictions, targets)
 

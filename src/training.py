@@ -37,6 +37,11 @@ def train_loop(model, loss_fn, optimizer, training_patches):
 
         # set the learning rate here
         positive_voxels = np.sum(mask)
+
+        if positive_voxels == 0:
+            continue
+            print("skipping patch")
+
         learning_rate = max(0.01, min((positive_voxels / 50000), 0.2))
 
         for param_group in optimizer.param_groups:
