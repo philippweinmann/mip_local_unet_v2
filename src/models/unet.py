@@ -106,6 +106,6 @@ def dice_bce_loss(predictions, targets):
     soft_dice_loss = softdiceloss(predictions, targets)
     bce_loss = nn.BCELoss()(predictions, targets)
 
-    combination = soft_dice_loss + bce_loss
+    combination = 3 * soft_dice_loss + bce_loss
 
     return combination
