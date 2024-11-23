@@ -7,6 +7,8 @@ patches_folder = config.DATA_FOLDER
 def get_preprocessed_patches():
     patch_fps = list(patches_folder.iterdir())
 
+    patch_fps = [file for file in patch_fps if "ipynb_checkpoints" not in str(file)]
+
     print("amt of detected patch files: ", len(patch_fps))
 
     return patch_fps

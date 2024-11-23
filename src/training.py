@@ -6,7 +6,7 @@ os.chdir(new_directory)
 from sklearn.model_selection import train_test_split
 import torch
 from src.training_utils import get_preprocessed_patches, get_image_mask_from_patch_fp
-from src.models.net_utils import get_best_device, prepare_image_for_network_input
+from src.models.net_utils import get_best_device, prepare_image_for_network_input, calculate_dice_score
 from src.models.unet import UNet3D, dice_bce_loss
 import numpy as np
 # %%
@@ -29,8 +29,15 @@ print("----------------TRAINING-------------")
 def train_loop(model, loss_fn, optimizer, training_patches):
     model.train()
 
-    for training_patch in training_patches:
+    avrg_loss = 0
+    dice_avg = 0
+
+    for idx, training_patch in enumerate(training_patches):
         image, mask = get_image_mask_from_patch_fp(training_patch)
+
+        if np.all(mask == 0):
+            continue
+
         image = prepare_image_for_network_input(image)
         mask = prepare_image_for_network_input(mask)
 
@@ -42,13 +49,23 @@ def train_loop(model, loss_fn, optimizer, training_patches):
         loss.backward()
         optimizer.step()
         
-        print(f"loss: {loss.item()}")
+        avrg_loss += loss.item()
+        dice_avg = calculate_dice_score(prediction, mask)
+
+        if idx % 10 == 0:
+            print(f"loss of last 10 patches: {avrg_loss / 10:8f}, dice score: {dice_avg/10:8f}")
+            avrg_loss = 0
+            dice_avg = 0
+
+
 
 def test_loop(model, loss_fn, test_patches):
     model.eval()
 
+    avrg_loss = 0
+    dice_avg = 0
     with torch.no_grad():
-        for test_patch in test_patches:
+        for idx, test_patch in enumerate(test_patches):
             image, mask = get_image_mask_from_patch_fp(test_patch)
             image = prepare_image_for_network_input(image)
             mask = prepare_image_for_network_input(mask)
@@ -56,7 +73,14 @@ def test_loop(model, loss_fn, test_patches):
             prediction = model(image)
 
             loss = loss_fn(prediction, mask)
-            print(f"loss: {loss.item()}")
+            
+            avrg_loss += loss.item()
+            dice_avg = calculate_dice_score(prediction, mask)
+
+            if idx % 10 == 0:
+                print(f"loss of last 10 patches: {avrg_loss / 10:8f}, dice score: {dice_avg/ 10:8f}")
+                avrg_loss = 0
+                dice_avg = 0
 # %%
 model = UNet3D(in_channels=1, num_classes=1)
 model.to(device);
