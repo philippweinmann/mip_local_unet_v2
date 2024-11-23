@@ -12,11 +12,6 @@ from src.preprocessing.preprocessing_utils import pad_image, resample_image, cli
 from src.preprocessing import preprocessing_config
 
 # %%
-patients = get_patients()
-# %%
-# let_s start with a single patient
-patient_x = patients[0]
-
 def save_patches_for_patient(patient):
     image = nib.load(patient.image_fp)
     mask = nib.load(patient.label_fp)
@@ -51,6 +46,15 @@ def save_patches_for_patient(patient):
 
                 np.savez(preprocessing_config.Output_dir / f"{patient.idx}_image_and_mask_patch_{x_dim}_{y_dim}_{z_dim}.npz", image = current_image_patch, mask = current_mask_patch)
 
-save_patches_for_patient(patient=patient_x)
+# %%
+def preprocess_and_save_ccta_scans(patients):
+    amt_patients = len(patients)
+    for p_idx, patient in enumerate(patients):
+        print(f"processing patient: {p_idx} / {amt_patients}")
 
+        save_patches_for_patient(patient=patient)
+
+    print("Done")
+
+preprocess_and_save_ccta_scans(patients = get_patients())
 # %%
