@@ -87,9 +87,7 @@ class UNet3D(nn.Module):
 
 # -------Loss-Functions----------
 def softdiceloss(predictions, targets, smooth: float = 0.001):
-    print(predictions.shape)
-    print(targets.shape)
-    
+
     batch_size = targets.shape[0]
     intersection = (predictions * targets).view(batch_size, -1).sum(-1)
 
@@ -110,6 +108,6 @@ def dice_bce_loss(predictions, targets):
     print(f"soft dice loss: {soft_dice_loss}")
     bce_loss = nn.BCELoss()(predictions, targets)
 
-    combination = 3 * soft_dice_loss + bce_loss
+    combination = 2 * soft_dice_loss + bce_loss
 
     return combination
