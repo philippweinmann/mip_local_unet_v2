@@ -31,7 +31,6 @@ def train_loop(model, loss_fn, optimizer, training_patches):
     model.train()
 
     avrg_loss = 0
-    dice_avg = 0
 
     for idx, training_patch in enumerate(training_patches):
         image, mask = get_image_mask_from_patch_fp(training_patch)

@@ -104,6 +104,7 @@ def dice_bce_loss(predictions, targets):
     from the soft dice loss without its potential instabilities.
     '''
     soft_dice_loss = softdiceloss(predictions, targets)
+    print(f"soft dice loss: {soft_dice_loss}")
     bce_loss = nn.BCELoss()(predictions, targets)
 
     combination = 3 * soft_dice_loss + bce_loss
