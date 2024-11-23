@@ -37,7 +37,7 @@ def train_loop(model, loss_fn, optimizer, training_patches):
 
         # set the learning rate here
         positive_voxels = np.sum(mask)
-        learning_rate = max(0.005, min((positive_voxels / 100000), 0.2))
+        learning_rate = max(0.01, min((positive_voxels / 50000), 0.2))
 
         for param_group in optimizer.param_groups:
             param_group['lr'] = learning_rate
@@ -68,9 +68,6 @@ test_losses = []
 
 def test_loop(model, loss_fn, test_patches):
     model.eval()
-
-    avrg_loss = 0
-    dice_avg = 0
     with torch.no_grad():
         for idx, test_patch in enumerate(test_patches):
             image, mask = get_image_mask_from_patch_fp(test_patch)
@@ -82,14 +79,10 @@ def test_loop(model, loss_fn, test_patches):
 
             loss = loss_fn(prediction, mask)
             
-            test_losses.append(loss.item())
-            avrg_loss += loss.item()
-            dice_avg = calculate_dice_score(prediction, mask)
+            loss_value = loss.item()
+            dice = calculate_dice_score(prediction, mask)
 
-            if idx % 10 == 0:
-                print(f"loss of last 10 patches: {avrg_loss / 10:8f}, dice score: {dice_avg/ 10:8f}")
-                avrg_loss = 0
-                dice_avg = 0
+            print(f"loss: {loss_value:6f}, dice: {dice}")
 # %%
 model = UNet3D(in_channels=1, num_classes=1)
 model.to(device);
@@ -101,6 +94,8 @@ epochs = 2
 try:
     for epoch in range(epochs):
         train_loop(model, loss_fn, optimizer, train)
+
+        print("------Testing------")
         test_loop(model, loss_fn, test)
 except KeyboardInterrupt:
     print("Training interrupted")
