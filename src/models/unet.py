@@ -11,8 +11,10 @@ class DoubleConv3D(nn.Module):
         super().__init__()  
         self.conv_op = nn.Sequential(
             nn.Conv3d(in_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm3d(out_channels),
             nn.ReLU(inplace=True),
             nn.Conv3d(out_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm3d(out_channels),
             nn.ReLU(inplace=True)
         )
   
@@ -35,10 +37,12 @@ class UpSample(nn.Module):
     def __init__(self, in_channels, out_channels):  
         super().__init__()
         self.up = nn.ConvTranspose3d(in_channels, in_channels//2, kernel_size=2, stride=2)
+        self.batch_norm = nn.BatchNorm3d(in_channels//2)
         self.conv = DoubleConv3D(in_channels, out_channels)
     
     def forward(self, x1, x2):
         x1 = self.up(x1)
+        x1 = self.batch_norm(x1)
 
         # we're gonna need some padding here
         x = torch.cat([x1, x2], 1)
