@@ -3,9 +3,9 @@ from src.configs import config
 
 # %%
 patches_folder = config.DATA_FOLDER
-def get_training_patches():
-    patches_files = list(patches_folder.iterdir())
+def get_preprocessed_patches():
+    patch_fps = list(patches_folder.iterdir())
 
-    print("amt of detected_files: ", len(patches_files))
+    print("amt of detected patch files: ", len(patch_fps))
 
-    return patches_files
+    return patch_fps
