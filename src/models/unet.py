@@ -88,12 +88,13 @@ class UNet3D(nn.Module):
 # -------Loss-Functions----------
 def calculate_dice_loss_multiplier(mask):
     print("mask shape is ", mask.shape)
-    number_of_positive_voxels = mask.sum()
+    number_of_positive_voxels = torch.count_nonzero(mask)
     print(f"number of positive voxels is {number_of_positive_voxels}")
 
     number_of_voxels = mask.numel()
+    print(f"number of voxels is {number_of_voxels}")
 
-    multiplier = config.MULTIPLIER_HYPERPARAMETER * number_of_voxels / number_of_positive_voxels
+    multiplier = config.MULTIPLIER_HYPERPARAMETER * number_of_positive_voxels / number_of_voxels
 
     print(f"multiplier is {multiplier}")
     return multiplier
