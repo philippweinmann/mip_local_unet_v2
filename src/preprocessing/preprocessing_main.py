@@ -19,7 +19,7 @@ patient_x = patients[0]
 
 def save_patches_for_patient(patient):
     image = nib.load(patient.image_fp)
-    mask = nib.load(patient.mask_fp)
+    mask = nib.load(patient.label_fp)
 
     # fix voxel spacing
     original_spacing = image.header.get_zooms()[:3]
@@ -38,8 +38,8 @@ def save_patches_for_patient(patient):
 
     # divide the 3d image and mask into patches:
     block_shape = (preprocessing_config.PATCH_SIZE, preprocessing_config.PATCH_SIZE, preprocessing_config.PATCH_SIZE)
-    image_patches = divide_3d_image_into_patches(padded_image, block_shape)
-    mask_patches = divide_3d_image_into_patches(padded_mask, block_shape)
+    image_patches = divide_3d_image_into_patches(image, block_shape)
+    mask_patches = divide_3d_image_into_patches(mask, block_shape)
 
     # let's save them to disk
     image_patch_shape = image_patches.shape
