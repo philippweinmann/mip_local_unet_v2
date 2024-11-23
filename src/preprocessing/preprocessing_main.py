@@ -88,17 +88,3 @@ for x_dim in range(image_patch_shape[0]):
 
             np.savez(output_dir / f"{patient_x.idx}_image_and_mask_patch_{x_dim}_{y_dim}_{z_dim}.npz", image = current_image_patch, mask = current_mask_patch)
 
-# %%
-# Let's visualize the first patch
-import matplotlib.pyplot as plt
-import numpy as np
-
-plt.imshow(image_patches[0][64], cmap="gray")
-plt.axis("off")
-plt.show()
-
-# %%
-plt.imshow(mask_patches[0][64], cmap="gray")
-plt.axis("off")
-plt.show()
-# %%
