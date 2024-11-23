@@ -36,9 +36,14 @@ def train_loop(model, loss_fn, optimizer, training_patches):
     for idx, training_patch in enumerate(training_patches):
         image, mask = get_image_mask_from_patch_fp(training_patch)
 
+        if np.all(mask == 0):
+            # print("skipping patch")
+            continue
+
         image = prepare_image_for_network_input(image)
         mask = prepare_image_for_network_input(mask)
 
+        
         optimizer.zero_grad()
 
         prediction = model(image)
@@ -67,6 +72,11 @@ def test_loop(model, loss_fn, test_patches):
     with torch.no_grad():
         for idx, test_patch in enumerate(test_patches):
             image, mask = get_image_mask_from_patch_fp(test_patch)
+            
+            if np.all(mask == 0):
+            # print("skipping patch")
+                continue
+            
             image = prepare_image_for_network_input(image)
             mask = prepare_image_for_network_input(mask)
 

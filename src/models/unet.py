@@ -108,5 +108,4 @@ def dice_bce_loss(predictions, targets):
 
     combination = soft_dice_loss + bce_loss
 
-    print(f"combination: {combination}")
     return combination
