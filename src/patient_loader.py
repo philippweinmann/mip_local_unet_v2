@@ -1,6 +1,7 @@
 # %%
 from pathlib import Path
 import nibabel as nib
+from src.preprocessing.preprocessing_utils import get_voxel_spacing
 
 training_data_folder = Path("/data/training_data/")
 training_files = list(training_data_folder.iterdir())
@@ -23,7 +24,7 @@ class Patient:
         self.label_fp = label_fp
 
     def get_original_voxel_spacing(self):
-        return self.get_voxel_spacing(self.image_fp) # x, y, z
+        return get_voxel_spacing(self.image_fp) # x, y, z
 
     def get_image_mask_tuple(self):
         image = nib.load(self.image_fp).get_fdata()
