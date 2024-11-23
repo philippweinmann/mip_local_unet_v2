@@ -1,10 +1,15 @@
 # %%
-import nibabel as nib
-import matplotlib.pyplot as plt
-import numpy as np
 import os
 new_directory = "/home/tu-philw/group/gecko/pweinmann/mip_local_unet_v2/"
 os.chdir(new_directory)
+
+# %%
+import nibabel as nib
+import matplotlib.pyplot as plt
+import numpy as np
+from src.preprocessing import preprocessing_config
+
+
 # %%
 from src.patient_loader import get_patients
 
@@ -68,7 +73,7 @@ def get_voxel_spacing(patient):
 voxel_spacings = get_voxel_spacing(patients[0])
 target_spacing = [0.325, 0.325, 0.5]
 
-def resample_image(image, original_spacing, target_spacing):
+def resample_image(image, original_spacing, target_spacing = preprocessing_config.TARGET_VOXEL_SPACING):
     print(original_spacing)
     print(target_spacing)
     zoom_factors = [original_spacing[i] / target_spacing[i] for i in range(3)]

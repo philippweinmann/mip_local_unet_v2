@@ -1,0 +1,1 @@
+TARGET_VOXEL_SPACING = [0.5, 0.5, 0.5]
