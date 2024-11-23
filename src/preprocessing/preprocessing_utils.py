@@ -34,6 +34,8 @@ def pad_image(image, patch_size):
     shape = image.shape
     print(shape)
 
+    padded_image = image
+    pad_lengths = []
     for idx, shape_dim in enumerate(shape):
         print(f"idx: {idx}")
         rest = shape_dim % patch_size
@@ -44,14 +46,15 @@ def pad_image(image, patch_size):
 
         # we need to add that many slices
         pad_length = patch_size - rest
+        pad_lengths.append(pad_length)
 
         # Pad the array with zeros along the first dimension, the zeroes are added at the end
         pad_width = [(0, pad_length) if i == idx else (0, 0) for i in range(len(shape))]
-        padded_image = np.pad(image, pad_width, mode='constant')
+        padded_image = np.pad(padded_image, pad_width, mode='constant')
 
         assert np.all(padded_image[-pad_length:0] == 0)
 
-    return padded_image
+    return padded_image, pad_lengths
 
 def divide_3d_image_into_patches(image_3d, block_shape):
     patches = view_as_blocks(image_3d, block_shape).squeeze()
