@@ -7,7 +7,8 @@ from pathlib import Path
 # %%
 from src.patient_loader import get_patients
 import nibabel as nib
-from src.preprocessing.preprocessing_utils import resample_image, clip_scans, min_max_normalize, pad_image, divide_3d_image_into_patches
+import numpy as np
+from src.preprocessing.preprocessing_utils import resample_image, clip_scans, min_max_normalize, divide_3d_image_into_patches
 from src.preprocessing import preprocessing_config
 
 # %%
@@ -33,6 +34,30 @@ clipped_resampled_image = clip_scans(resampled_image, preprocessing_config.CLIPP
 min_max_normalized_image = min_max_normalize(clipped_resampled_image, preprocessing_config.CLIPPING_MIN, preprocessing_config.CLIPPING_MAX)
 
 # %%
+def pad_image(image, patch_size):
+    shape = image.shape
+    print(shape)
+
+    padded_image = image
+    for idx, shape_dim in enumerate(shape):
+        print(f"idx: {idx}")
+        rest = shape_dim % patch_size
+
+        if rest == 0:
+            print(f"no padding required for dim {idx}. Original image shape: {image.shape}")
+            continue
+
+        # we need to add that many slices
+        pad_length = patch_size - rest
+
+        # Pad the array with zeros along the first dimension, the zeroes are added at the end
+        pad_width = [(0, pad_length) if i == idx else (0, 0) for i in range(len(shape))]
+        padded_image = np.pad(padded_image, pad_width, mode='constant')
+
+        assert np.all(padded_image[-pad_length:0] == 0)
+
+    return padded_image
+# %%
 # Pad the image to prepare for patch extraction
 patch_size = 128
 padded_image = pad_image(min_max_normalized_image, patch_size)
@@ -49,18 +74,19 @@ mask_patches = divide_3d_image_into_patches(padded_mask, block_shape)
 # %%
 # let's save the patches to disk
 output_dir = preprocessing_config.Output_dir
+output_dir.mkdir(parents=True, exist_ok=True)
+
 img_patch_prefix = f"{patient_x.idx}_image_patch_"
 label_patch_prefix = f"{patient_x.idx}_label_patch_"
 
-for idx, (image_patch, mask_patch) in enumerate(zip(image_patches, mask_patches)):
-    img_patch_fp = output_dir / f"{img_patch_prefix}{idx}.nii.gz"
-    label_patch_fp = output_dir / f"{label_patch_prefix}{idx}.nii.gz"
+image_patch_shape = image_patches.shape
+for x_dim in range(image_patch_shape[0]):
+    for y_dim in range(image_patch_shape[1]):
+        for z_dim in range(image_patch_shape[2]):
+            current_image_patch = image_patches[x_dim, y_dim, z_dim]
+            current_mask_patch = mask_patches[x_dim, y_dim, z_dim]
 
-    img_patch = nib.Nifti1Image(image_patch, affine=image.affine)
-    label_patch = nib.Nifti1Image(mask_patch, affine=mask.affine)
-
-    nib.save(img_patch, img_patch_fp)
-    nib.save(label_patch, label_patch_fp)
+            np.savez(output_dir / f"{patient_x.idx}_image_and_mask_patch_{x_dim}_{y_dim}_{z_dim}.npz", image = current_image_patch, mask = current_mask_patch)
 
 # %%
 # Let's visualize the first patch
