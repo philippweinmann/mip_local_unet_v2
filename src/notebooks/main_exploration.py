@@ -1,5 +1,7 @@
 # %%
 import os
+
+from visualizations.visualizations_utils import visualize_ccta_scan_slice
 new_directory = "/home/tu-philw/group/gecko/pweinmann/mip_local_unet_v2/"
 os.chdir(new_directory)
 
@@ -71,17 +73,20 @@ def get_voxel_spacing(patient):
     return [img_x_dim_spacing, img_y_dim_spacing, img_z_dim_spacing]
 
 voxel_spacings = get_voxel_spacing(patients[0])
-target_spacing = [0.325, 0.325, 0.5]
 
 def resample_image(image, original_spacing, target_spacing = preprocessing_config.TARGET_VOXEL_SPACING):
-    print(original_spacing)
-    print(target_spacing)
+    print(f"original spacing: {original_spacing}")
     zoom_factors = [original_spacing[i] / target_spacing[i] for i in range(3)]
     resampled_image = zoom(image, zoom_factors, order=1)  # Linear interpolation
+    print(f"file has now isotropopic voxel spacing: {target_spacing}")
     return resampled_image
 
 image = nib.load(patient_x.image_fp).get_fdata()
-resampled_image = resample_image(image, voxel_spacings, target_spacing)
+resampled_image = resample_image(image, voxel_spacings)
 print("Original shape:", image.shape)
 print("Resampled shape:", resampled_image.shape)
+visualize_ccta_scan_slice(image)
+
+# %%
+visualize_ccta_scan_slice(resampled_image)
 # %%
