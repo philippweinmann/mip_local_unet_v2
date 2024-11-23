@@ -32,8 +32,10 @@ def min_max_normalize(image, min_value, max_value):
 
 def pad_image(image, patch_size):
     shape = image.shape
+    print(shape)
 
     for idx, shape_dim in enumerate(shape):
+        print(f"idx: {idx}")
         rest = shape_dim % patch_size
 
         if rest == 0:

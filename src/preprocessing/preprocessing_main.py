@@ -41,6 +41,8 @@ padded_mask = pad_image(resampled_mask, patch_size)
 # %%
 # divide the 3d image into patches
 block_shape = (patch_size, patch_size, patch_size) # isomorphic patches
+print(f"block_shape: {block_shape}")
+print(f"padded_image shape: {padded_image.shape}")
 image_patches = divide_3d_image_into_patches(padded_image, block_shape)
 mask_patches = divide_3d_image_into_patches(padded_mask, block_shape)
 
