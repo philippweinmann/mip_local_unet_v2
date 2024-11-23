@@ -26,6 +26,7 @@ train, test = train_test_split(patch_fps, test_size=0.2, random_state=42)
 # %%
 print("----------------TRAINING-------------")
 
+training_losses = []
 def train_loop(model, loss_fn, optimizer, training_patches):
     model.train()
 
@@ -34,9 +35,6 @@ def train_loop(model, loss_fn, optimizer, training_patches):
 
     for idx, training_patch in enumerate(training_patches):
         image, mask = get_image_mask_from_patch_fp(training_patch)
-
-        if np.all(mask == 0):
-            continue
 
         image = prepare_image_for_network_input(image)
         mask = prepare_image_for_network_input(mask)
@@ -49,8 +47,9 @@ def train_loop(model, loss_fn, optimizer, training_patches):
         loss.backward()
         optimizer.step()
         
+        training_losses.append(loss.item())
         avrg_loss += loss.item()
-        dice_avg = calculate_dice_score(prediction, mask)
+        dice_avg += calculate_dice_score(prediction, mask)
 
         if idx % 10 == 0:
             print(f"loss of last 10 patches: {avrg_loss / 10:8f}, dice score: {dice_avg/10:8f}")
@@ -58,6 +57,7 @@ def train_loop(model, loss_fn, optimizer, training_patches):
             dice_avg = 0
 
 
+test_losses = []
 
 def test_loop(model, loss_fn, test_patches):
     model.eval()
@@ -74,6 +74,7 @@ def test_loop(model, loss_fn, test_patches):
 
             loss = loss_fn(prediction, mask)
             
+            test_losses.append(loss.item())
             avrg_loss += loss.item()
             dice_avg = calculate_dice_score(prediction, mask)
 
@@ -96,4 +97,13 @@ try:
 except KeyboardInterrupt:
     print("Training interrupted")
     model.eval()
+# %%
+# visualize the training losses
+import matplotlib.pyplot as plt
+
+plt.hist(training_losses, bins=20)
+plt.xlabel("bin means")
+plt.ylabel("amount of elements in bin")
+plt.show()
+# %%
 # %%
