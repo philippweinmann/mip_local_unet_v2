@@ -86,25 +86,6 @@ class UNet3D(nn.Module):
 # loss functions
 
 # -------Loss-Functions----------
-def calculate_dice_loss_multiplier(mask):
-    print("mask shape is ", mask.shape)
-    number_of_positive_voxels = torch.count_nonzero(mask)
-    print(f"number of positive voxels is {number_of_positive_voxels}")
-
-    number_of_voxels = mask.numel()
-    print(f"number of voxels is {number_of_voxels}")
-
-    multiplier = config.MULTIPLIER_HYPERPARAMETER * number_of_positive_voxels / number_of_voxels
-
-    print(f"multiplier is {multiplier}")
-    return multiplier
-
-def calculate_bce_loss_multiplier(mask):
-
-    bce_mult = (mask.sum() / config.NUMBER_OF_POS_FOR_BCE_TO_BE_1)
-    
-    return max(bce_mult, 0.05)
-
 def softdiceloss(predictions, targets, smooth: float = 0.001):
     batch_size = targets.shape[0]
     intersection = (predictions * targets).view(batch_size, -1).sum(-1)
@@ -116,7 +97,7 @@ def softdiceloss(predictions, targets, smooth: float = 0.001):
 
     return (1 - dice.mean())
 
-def dice_bce_loss(predictions, targets, weights = (1, 0.5)):
+def dice_bce_loss(predictions, targets):
     '''
     Combination between the bce loss and the soft dice loss. 
     The goal is to get the advantages
@@ -125,12 +106,7 @@ def dice_bce_loss(predictions, targets, weights = (1, 0.5)):
     soft_dice_loss = softdiceloss(predictions, targets)
     bce_loss = nn.BCELoss()(predictions, targets)
 
-    bce_loss_multiplier = calculate_bce_loss_multiplier(targets)
-    dice_loss_multiplier = calculate_dice_loss_multiplier(targets)
-
-    print(f"bce loss multiplier: {bce_loss_multiplier}, dice loss multiplier: {dice_loss_multiplier}")
-
-    combination = dice_loss_multiplier * soft_dice_loss + bce_loss_multiplier * bce_loss
+    combination = soft_dice_loss + bce_loss
 
     print(f"combination: {combination}")
     return combination
