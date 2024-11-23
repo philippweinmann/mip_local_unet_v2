@@ -1,3 +1,4 @@
+# %%
 from sklearn.metrics import jaccard_score
 from sklearn.metrics import f1_score # this is the dice score
 from scipy.spatial.distance import directed_hausdorff
@@ -134,4 +135,3 @@ def calculate_correctness_for_binary_input(pred, mask):
             false_positive = 1
     
     return np.array([correct_positive, correct_negative, false_positive, false_negative])
-    
