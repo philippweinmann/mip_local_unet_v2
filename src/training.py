@@ -62,7 +62,7 @@ def train_loop(model, loss_fn, optimizer, training_patches):
             dice = calculate_dice_score(prediction, mask)
             print(f"dice score: {dice}")
 
-        print(f"loss: {loss_value:6f}, learning rate: {learning_rate:6f}, dice: {dice}")
+        print(f"loss: {loss_value:6f}, learning rate: {learning_rate}, dice: {dice}")
 
 
 test_losses = []
