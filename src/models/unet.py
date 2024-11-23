@@ -88,7 +88,8 @@ class UNet3D(nn.Module):
 # -------Loss-Functions----------
 def softdiceloss(predictions, targets, smooth: float = 0.001):
     print(predictions.shape)
-
+    print(targets.shape)
+    
     batch_size = targets.shape[0]
     intersection = (predictions * targets).view(batch_size, -1).sum(-1)
 
