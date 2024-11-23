@@ -1,6 +1,7 @@
 # %%
 from src.configs import config
 import torch
+import numpy as np
 # %%
 patches_folder = config.DATA_FOLDER
 def get_preprocessed_patches():
@@ -11,7 +12,7 @@ def get_preprocessed_patches():
     return patch_fps
 
 def get_image_mask_from_patch_fp(patch_fp):
-    patch = torch.load(patch_fp)
+    patch = np.load(patch_fp)
     image = patch["image"]
     mask = patch["mask"]
 

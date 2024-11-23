@@ -72,3 +72,4 @@ try:
 except KeyboardInterrupt:
     print("Training interrupted")
     model.eval()
+# %%
